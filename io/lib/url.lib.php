@@ -1,17 +1,25 @@
 <?php
 
-class url{
+class queryString{
+	
+}
+
+/**/
+class url extends queryString{
 	
 	private $url;
-	
+
 	public $get   = NULL;
 	public $query = NULL;
 	public $path  = NULL;
 	public $file  = NULL;
 	public $post  = NULL;
 	
-	//explode data $_GET and $_POST
-	// @return Array
+	/*
+	* explode data _GET and POST
+	* var=value&var1=value1
+	* @return Array data
+	*/
 	private function explodeData( $data, $_FULL = Array( ) ){
 		$ret = [];
 		$data = explode("&", $data );
@@ -27,8 +35,10 @@ class url{
 	}
 	//
 	
-	// __construct
-	// @return $this
+	/*
+	* __construct 
+	* @return $this
+	*/
 	public function __construct( $uri ){
 		$this->url = $uri;
 		
@@ -38,9 +48,6 @@ class url{
 			$this->path   = $find[ 1 ];
 			$this->query  = $find[ 2 ];
 			$this->get    = str_replace("?","", $find[ 2 ]);
-			
-							 
-			$_GET = $this->explodeData( $this->get, $_GET );
 			
 		}
 		$this->path = $this->path == NULL ? $uri : $this->path;

@@ -26,6 +26,7 @@ class httpHeaderResponse{
 class __http__{
 	
 	// ParseHeader Query
+	// 
 	private static function headParse( $head, $ret ){
 		$header = explode( "\r\n", $head );
 		
@@ -137,32 +138,32 @@ class __http__{
 	
 	// param : httpHeaderResponse header
 	// @reutrn String headerFormat
-	public static function rawHeaderResponse( $httpHeaderResponse ){
-		return self::rawHeader( $httpHeaderResponse );	
+	public static function rawHeaderResponse( httpHeaderResponse $header ){
+		return self::rawHeader( $header );	
 	}
 	
 	// param : httpHeaderQuery header
 	// @reutrn String headerFormat
-	public static function rawHeaderQuery( $httpHeaderQuery ){
-		return self::rawHeader( $httpHeaderQuery );		
+	public static function rawHeaderQuery( httpHeaderQuery $header ){
+		return self::rawHeader( $header );		
 	}
 	
-	// param : httpHeaderResponse || httpHeaderQuery,
-	// string optionName
+	// param : httpHeaderQuery,
 	// @reutrn String headerFormat
-	public static function handshakePacket( $httpHeaderQuery ){
+	public static function handshakePacket( httpHeaderQuery $header ){
 	return self::rawHeaderResponse( 
 			self::mountResponse(
 				ST_SWITCH_PROTOCOL,"WebSocket Protocol Handshake",
 				array( 
 					"Connection" 			=> "Upgrade",
-					"Sec-WebSocket-Accept"   => base64_encode( sha1( $httpHeaderQuery->options["Sec-WebSocket-Key"]."258EAFA5-E914-47DA-95CA-C5AB0DC85B11", true  ) ),
-					"Sec-WebSocket-Location" => "ws://".$httpHeaderQuery->options["Host"],
-					"Sec-WebSocket-Origin"   => "http://".$httpHeaderQuery->options["Host"],
+					"Sec-WebSocket-Accept"   => base64_encode( sha1( $header->options["Sec-WebSocket-Key"]."258EAFA5-E914-47DA-95CA-C5AB0DC85B11", true  ) ),
+					"Sec-WebSocket-Location" => "ws://".$header->options["Host"],
+					"Sec-WebSocket-Origin"   => "http://".$header->options["Host"],
 					"Upgrade" 				=>  "WebSocket",
 				)
 		 ) );
 	}
+	
 }
 
 
