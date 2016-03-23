@@ -12,6 +12,7 @@
     // Method
     listen 
     accept
+    close
   );
 ```
 
@@ -77,7 +78,7 @@ Fabriquer une réponse ( server ) :
 ```
 
 ```php
-  $__http__->rawHeaderResponse( 
+  __http__::rawHeaderResponse( 
     httpHeaderResponse header
   );
   HTTP/1.1 200 OK\r\n
@@ -107,7 +108,7 @@ Fabriquer une réponse ( server ) :
 ```
 
 ```php
-  $__http__->rawHeaderResponse( 
+  __http__::rawHeaderResponse( 
     httpHeaderQuery header
   );
   POST / HTTP/1.1\r\n
@@ -117,6 +118,8 @@ Fabriquer une réponse ( server ) :
   uid=12&time=0
 ```
 
+> __http__::handshakePacket( httpHeaderQuery )
+pour les protocol websocket
 
 # url.lib
 
@@ -149,14 +152,14 @@ Fabriquer une réponse ( server ) :
   $url->getExtension( ) // @return php
 ```
 ```php
-  $url->_GET( ); // @return
+  $url->_GET( array || void ); // @return
   => ( 
     id   => 2,
   );
 ```
 ```php
   $url->post = "foo=bar&test=25"
-  $url->_POST( ); // @return
+  $url->_POST( array || void ); // @return
   => ( 
     foo   => bar,
     test  => 25
