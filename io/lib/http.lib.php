@@ -1,8 +1,70 @@
 <?php
 
-// Struct header
-//
-class httpHeaderQuery{
+/**
+ * http.lib.php
+ *
+ * little http libraries,she allows 
+ * read  a http header received or
+ * just write header http . Be careful
+ * this library does not  manages errors
+ * malformed queries while reading http
+ * header.
+ *
+ * @category   static library
+ * @package    http
+ * @author     looter
+ * @copyright  2016 devgnode GPL/GPU 
+ *
+ */
+ 
+ interface ___httpconst__{
+	
+	// listing of codes HTTP more used
+	// client & server
+	
+	// const Status code 
+	// protocol HTTP
+	const ST_CONTINUE			= 100;
+	const ST_SWITCH_PROTOCOL	= 101;
+	const ST_PROCESSING			= 102;
+
+	// success 
+	const ST_OK			= 200;
+	const ST_CREATE		= 201;
+	const ST_ACCEPT 	= 202;
+	
+	// redirect
+	const ST_MOVED			= 301;
+	const ST_FOUND			= 302;
+	const ST_NOT_MODIFIED	= 304;
+	
+	// client 
+	const ST_BAD_REQ		= 400;
+	const ST_UNHAUTH		= 401;
+	const ST_PAYMENTREQ		= 402;
+	const ST_FORBIDDEN		= 403;
+	const ST_NOTFOUND 		= 404;	
+	const ST_NOTALLOWED		= 405;
+	const ST_REQTIMEOUT		= 408;
+	
+	// sevrer
+	const ST_INTERNAL_SERVER_ERROR	= 500;
+	const ST_BAD_GATEWAY			= 502;
+	const ST_GATEWAY_TIMEOUT		= 504;
+	//...
+	//...
+	
+	
+}
+
+ /*
+// Differents structure  http hedear who 
+// can be received it ( reading ) or send ( writing )
+//	httpHeaderQuery	   ( client )
+//  httpHeaderResponse ( server )
+//  Object
+*/
+class httpHeaderQuery implements ___httpconst__{
 	
 	public $method;
 	public $uri;
@@ -11,26 +73,28 @@ class httpHeaderQuery{
 	public $options  = Array( );
 	public $postData = NULL;
 }
-class httpHeaderResponse{
+class httpHeaderResponse implements ___httpconst__{
 	
 	public $version     = "HTTP/1.1";
-	public $statusCode  = 0x00;
+	public $statusCode  = 0x0000;
 	public $msgCode     = "";
 
 	public $options = Array( );
 	public $content = NULL;
 }
-//
 
 //
-class __http__{
+// 
+//
+class __http__ implements ___httpconst__{
 	
 	// ParseHeader Query
 	// 
 	private static function headParse( $head, $ret ){
 		$header = explode( "\r\n", $head );
 		
-		// review preg_match hack
+		// review preg_match 
+		// simply parsing
 		preg_match("/(.+) (.+) (.+)/", $header[0], $tmp );
 		if( count( $tmp ) <= 1 )
 			return false;;
@@ -48,25 +112,22 @@ class __http__{
 			$ret->msgCode    = $tmp[3];
 		}
 		
-		// Options
-		$tmp = [];
-		for( $i=1; $i < count( $header ); $i++ ){
+		try{
+			// Options
+			$tmp = [];
+			for( $i=1; $i < count( $header ); $i++ ){
 			
-			preg_match( "/^(.+)\: (.+)/", $header[$i], $tmp );
-			if( count( $tmp ) == 3 ){
-				$ret->options[ $tmp[1] ] = $tmp[2];
+				preg_match( "/^(.+)\: (.+)/", $header[$i], $tmp );
+				if( count( $tmp ) == 3 ){
+					$ret->options[ $tmp[1] ] = $tmp[2];
+				}
 			}
-		}
+		}catch( Exception $e ){};
+		
 		
 		// DATA
 		if( strlen( $header[ count( $header )-1 ] ) > 0 ){
-			
-			if( ($ret instanceof httpHeaderQuery ) ){
-				$ret->postData = $header[ count( $header )-1 ];
-			}else{
-				$ret->content  = $header[ count( $header )-1 ];
-			}
-			
+			$ret->{ ( ($ret instanceof httpHeaderQuery ) ? "postData" : "content" ) } =  $header[ count( $header )-1 ];			
 		}
 		
 	return $ret;
@@ -116,52 +177,39 @@ class __http__{
 		$ret = "";
 		
 		// headerResponse
-		if( $header instanceof httpHeaderResponse  ){
-			$ret .= $header->version." ".
-					$header->statusCode." ".
-					$header->msgCode."\r\n";
-		}else{
-			$ret .= $header->method." ".
-				    $header->uri." ".
-				    $header->version."\r\n";
-		}
+		$ret .= ( ( $header instanceof httpHeaderResponse  ) ?
+					( $header->version." ".
+					  $header->statusCode." ".
+					  $header->msgCode."\r\n" ) :
+					  //
+					( $header->method." ".
+					  $header->uri." ".
+				      $header->version."\r\n" ) );
 		
+		// options
 		foreach( $header->options as $option=>$val ){
 			$ret .= $option.": ".$val."\r\n";
 		}
 		$ret .= "\r\n";
+		
 		isset( $header->content ) && ( $ret instanceof httpHeaderResponse ) ? ( $ret .= $header->content != NULL ? $header->content  : "" ) : 0;
 		isset( $header->postData ) && ( $ret instanceof httpHeaderQuery ) ? ( $ret .= $header->postData != NULL ? $header->postData : "" ): 0;
 		
 	return $ret;
 	}
 	
+	//// ready to be sent
 	// param : httpHeaderResponse header
 	// @reutrn String headerFormat
 	public static function rawHeaderResponse( httpHeaderResponse $header ){
 		return self::rawHeader( $header );	
 	}
 	
+	//// ready to be sent
 	// param : httpHeaderQuery header
 	// @reutrn String headerFormat
 	public static function rawHeaderQuery( httpHeaderQuery $header ){
 		return self::rawHeader( $header );		
-	}
-	
-	// param : httpHeaderQuery,
-	// @reutrn String headerFormat
-	public static function handshakePacket( httpHeaderQuery $header ){
-	return self::rawHeaderResponse( 
-			self::mountResponse(
-				ST_SWITCH_PROTOCOL,"WebSocket Protocol Handshake",
-				array( 
-					"Connection" 			=> "Upgrade",
-					"Sec-WebSocket-Accept"   => base64_encode( sha1( $header->options["Sec-WebSocket-Key"]."258EAFA5-E914-47DA-95CA-C5AB0DC85B11", true  ) ),
-					"Sec-WebSocket-Location" => "ws://".$header->options["Host"],
-					"Sec-WebSocket-Origin"   => "http://".$header->options["Host"],
-					"Upgrade" 				=>  "WebSocket",
-				)
-		 ) );
 	}
 	
 }
