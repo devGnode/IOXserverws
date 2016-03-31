@@ -17,7 +17,7 @@
  *
  */
  
- interface ___httpconst__{
+ interface __httpconst__{
 	
 	// listing of codes HTTP more used
 	// client & server
@@ -65,7 +65,7 @@
 //  httpHeaderResponse ( server )
 //  Object
 */
-class httpHeaderQuery implements ___httpconst__{
+class httpHeaderQuery implements __httpconst__{
 	
 	public $method;
 	public $uri;
@@ -74,7 +74,7 @@ class httpHeaderQuery implements ___httpconst__{
 	public $options  = Array( );
 	public $postData = NULL;
 }
-class httpHeaderResponse implements ___httpconst__{
+class httpHeaderResponse implements __httpconst__{
 	
 	public $version     = "HTTP/1.1";
 	public $statusCode  = 0x0000;
@@ -87,8 +87,9 @@ class httpHeaderResponse implements ___httpconst__{
 //
 // 
 //
-class __http__ implements ___httpconst__{
+class __http__ implements __httpconst__{
 	
+	//	StatusCode 
 	private static $messageStatusCode = array( 
 		self::ST_CONTINUE				=> 'Continue',
 		self::ST_SWITCH_PROTOCOL		=> 'Switching Protocols',
