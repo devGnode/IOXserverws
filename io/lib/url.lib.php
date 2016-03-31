@@ -1,10 +1,17 @@
 <?php
-
-class queryString{
-	
-}
-
-/**/
+/**
+ * url.lib.php
+ *
+ * url library ,she allows 
+ * parsing a simple url
+ * protocol://host[ url library ]
+ *
+ * @category   Object library
+ * @package    url
+ * @author     looter
+ * @copyright  2016 devgnode GPL/GPU 
+ *
+ */
 class url extends queryString{
 	
 	private $url;
