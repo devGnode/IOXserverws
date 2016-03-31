@@ -50,10 +50,11 @@
 	// sevrer
 	const ST_INTERNAL_SERVER_ERROR	= 500;
 	const ST_BAD_GATEWAY			= 502;
+	const ST_SERVICE_UNAVAIBLE		= 503;
 	const ST_GATEWAY_TIMEOUT		= 504;
+	const ST_NOT_SUPPORTED			= 505;
 	//...
 	//...
-	
 	
 }
 
@@ -87,6 +88,53 @@ class httpHeaderResponse implements ___httpconst__{
 // 
 //
 class __http__ implements ___httpconst__{
+	
+	private static $messageStatusCode = array( 
+		self::ST_CONTINUE				=> 'Continue',
+		self::ST_SWITCH_PROTOCOL		=> 'Switching Protocols',
+		self::ST_PROCESSING				=> 'Processing',
+		self::ST_OK						=> 'OK',
+		self::ST_CREATE					=> 'Created',
+		self::ST_ACCEPT					=> 'Accepted',
+		203								=> 'Non-Authoritative Information',
+		204								=> 'No Content',
+		205								=> 'Reset Content',	
+		206								=> 'Partial Content',
+		300								=> 'Multiple Choices',
+		self::ST_FOUND					=> 'Moved Permanently',
+		self::ST_MOVED					=> 'Moved Temporarily',
+		303								=> 'See Other',
+		self::ST_NOT_MODIFIED			=> 'Not Modified',
+		305								=> 'Use Proxy',
+		self::ST_BAD_REQ				=> 'Bad Request',
+		self::ST_UNHAUTH				=> 'Unauthorized',
+		self::ST_PAYMENTREQ				=> 'Payment Required',
+		self::ST_FORBIDDEN				=> 'Forbidden',
+		self::ST_NOTALLOWED				=> 'Method Not Allowed',
+		406								=> 'Not Acceptable',
+		407								=> 'Proxy Authentication Required',
+		self::ST_REQTIMEOUT				=> 'Request Time-out',
+		409								=> 'Conflict',
+		410								=> 'Gone',
+		411								=> 'Length Required',
+		412								=> 'Precondition Failed',
+		413								=> 'Request Entity Too Large',
+		414								=> 'Request-URI Too Large',
+		415								=> 'Unsupported Media Type',
+		self::ST_INTERNAL_SERVER_ERROR	=> 'Internal Server Error',
+		501								=> 'Not Implemented',
+		self::ST_BAD_GATEWAY			=> 'Bad Gateway',
+		self::ST_SERVICE_UNAVAIBLE		=> 'Service Unavailable',
+		self::ST_GATEWAY_TIMEOUT		=> 'Gateway Time-out',
+		self::ST_NOT_SUPPORTED			=> 'HTTP Version not supported'
+	);
+
+	// getMessageStatusCode
+	//
+	private static function getStatusCode( httpHeaderResponse $header ){
+	return( isset( self::$messageStatusCode[ $header->statusCode ] ) ?
+			self::$messageStatusCode[ $header->statusCode ] : NULL );
+	}
 	
 	// ParseHeader Query
 	// 
@@ -146,11 +194,11 @@ class __http__ implements ___httpconst__{
 	
 	// mount headerResponse
 	// @return httpHeaderResponse header
-	public static function mountResponse( $status, $msgCode, $options = array( ), $data = NULL ){
+	public static function mountResponse( $status, $msgCode = NULL, $options = array( ), $data = NULL ){
 		$header = new httpHeaderResponse( );	
 		
 		$header->statusCode  = $status;
-		$header->msgCode   	 = $msgCode;
+		$header->msgCode   	 = ( $msgCode == NULL ? self::getStatusCode( $status ) : $msgCode );
 		$header->options     = $options;
 		$header->content     = $data;
 
@@ -213,6 +261,6 @@ class __http__ implements ___httpconst__{
 	}
 	
 }
-
+//
 
 ?>
