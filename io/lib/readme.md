@@ -87,7 +87,7 @@ Fabriquer une réponse ( server ) :
   \r\n
   <b>Hello World !</b>
 ```
-Fabriquer une réponse ( server ) :
+Fabriquer une réponse ( client ) :
 ```php
   __http__::mountQuery( 
       string method,
@@ -117,9 +117,6 @@ Fabriquer une réponse ( server ) :
   \r\n
   uid=12&time=0
 ```
-
-> __http__::handshakePacket( httpHeaderQuery )
-pour les protocol websocket
 
 # url.lib
 
